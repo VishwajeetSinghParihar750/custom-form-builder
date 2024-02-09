@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { UseSelector, useDispatch, useSelector } from "react-redux";
 import { formSliceActions } from "../../store/formSlice";
 
@@ -21,6 +21,24 @@ function Index(props) {
       dispatch(formSliceActions.resetFormValues());
     } else formEle.reportValidity();
   };
+
+  useEffect(() => {
+    formElements.forEach((element) => {
+      if (!element.isInput) {
+        console.log(element.id, element.options.split(",")[0]);
+        dispatch(
+          formSliceActions.setSelect({
+            id: element.id,
+            value:
+              element.value ||
+              (element.options ? element.options.split(",")[0] : ""), // Set initial value
+          })
+        );
+      }
+    });
+  }, [dispatch, formElements]);
+
+  console.log(formElements);
 
   return (
     <div>
@@ -59,7 +77,10 @@ function Index(props) {
                   <select
                     className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                     id={element.id}
-                    value={element.value}
+                    value={
+                      element.value ||
+                      (element.options ? element.options.split(",")[0] : "")
+                    } // Initialize value with the first option
                     required
                     onChange={(e) => {
                       dispatch(
@@ -71,7 +92,9 @@ function Index(props) {
                     }}
                   >
                     {element?.options?.split(",").map?.((op) => (
-                      <option value={op}>{op}</option>
+                      <option key={op} value={op}>
+                        {op}
+                      </option>
                     ))}
                   </select>
                 </div>
